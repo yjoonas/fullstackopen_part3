@@ -1,8 +1,26 @@
 const express = require('express');
+const morgan = require('morgan')
 const app = express();
 const PORT = 3001;
 
+morgan.token('body', (req) => {
+    return JSON.stringify(req.body)
+})
+
 app.use(express.json())
+app.use(morgan((tokens, req, res) => {
+    const arr = [
+        tokens.method(req, res),
+        tokens.url(req, res),
+        tokens.status(req, res),
+        tokens.res(req, res, 'content-length'), '-',
+        tokens['response-time'](req, res), 'ms'
+    ]
+    if (tokens.method(req) === 'POST') {
+        arr.push(tokens.body(req))
+    }
+    return arr.join(' ')
+}))
 
 let persons = [
     {
