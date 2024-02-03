@@ -48,7 +48,8 @@ let persons = [
     },
 
 ]
-
+app.get("/", (req, res) => {
+})
 app.get('/info', (req, res) => {
     res.end(`
     <p>Phonebook has info for ${persons.length} people</p>
