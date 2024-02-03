@@ -1,5 +1,6 @@
 const express = require('express');
 const morgan = require('morgan')
+const cors = require("cors")
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -8,6 +9,8 @@ morgan.token('body', (req) => {
 })
 
 app.use(express.json())
+app.use(express.static("dist"))
+app.use(cors())
 app.use(morgan((tokens, req, res) => {
     const arr = [
         tokens.method(req, res),
