@@ -44,7 +44,7 @@ app.get('/api/persons', (req, res) => {
     })
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
     const body = req.body;
     if (!body.name || !body.phoneNumber) {
         res.status(422).json({
@@ -54,33 +54,59 @@ app.post('/api/persons', (req, res) => {
         res.status(409).json({
             error: "Name must be unique"
         })
-    } */else {
+    } */ else {
         const person = new Person({
             name: body.name,
             phoneNumber: body.phoneNumber
         })
-        person.save().then(savedPerson => {
-            res.json(savedPerson)
+        person.save()
+            .then(savedPerson => res.json(savedPerson))
+            .catch(error => next(error))
+    }
+
+})
+
+app.get('/api/persons/:id', (req, res, next) => {
+    Person.findById(req.params.id)
+        .then(person => {
+            if (person) {
+                res.json(person);
+            } else {
+                res.status(404).end()
+            }
         })
+        .catch(err => {
+            next(err)
+        })
+})
+app.put('/api/persons/:id', (req, res, next) => {
+    const person = req.body
+    Person.findByIdAndUpdate(req.params.id, person, {new: true})
+        .then(updatedPerson => res.json(updatedPerson))
+        .catch(error => next(error))
+})
+app.delete('/api/persons/:id', (req, res, next) => {
+    Person.findByIdAndDelete(req.params.id)
+        .then(() => res.status(204).end())
+        .catch(error => next(error))
+})
+
+const unknownEndPoint = (request, response) => {
+    response.status(404).send({ error: "Unknown endpoint"})
+}
+app.use(unknownEndPoint)
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+    console.error(error)
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({ error: 'malformatted id' })
     }
+    next(error)
+}
 
-})
-
-app.get('/api/persons/:id', (req, res) => {
-    const id = Number(req.params.id)
-    const person = persons.find(person => person.id === id);
-    if (!!person) {
-        res.json(person);
-    } else {
-        res.status(404).end();
-    }
-})
-
-app.delete('/api/persons/:id', (req, res) => {
-    const id = Number(req.params.id)
-    persons = persons.filter(person => person.id !== id);
-    res.send(204).end();
-})
+// tämä tulee kaikkien muiden middlewarejen ja routejen rekisteröinnin jälkeen!
+app.use(errorHandler)
 
 app.listen(PORT, () => {
     console.log(`Listening port: ${PORT}`)
