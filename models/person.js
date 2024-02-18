@@ -1,19 +1,19 @@
-const mongoose = require("mongoose")
+const mongoose = require('mongoose')
 
 const uri = process.env.MONGODB_URI
 
 mongoose.connect(uri)
-.then(() => {
-    console.log("Connected to Mongodb")
-})
-.catch(error => {
-    console.log("Error connecting to Mongodb:", error.message)
-})
+    .then(() => {
+        console.log('Connected to Mongodb')
+    })
+    .catch(error => {
+        console.log('Error connecting to Mongodb:', error.message)
+    })
 
 const personSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: [true, "Name is required"],
+        required: [true, 'Name is required'],
         minLength: 3,
     },
     phoneNumber: {
@@ -21,7 +21,7 @@ const personSchema = new mongoose.Schema({
         minLength: 8,
         validate: {
             validator: function(v) {
-                return /\d+-\d+/.test(v);
+                return /\d+-\d+/.test(v)
             },
             message: props => `${props.value} is not a valid phone number! 123-1231213 is correct format`
         },
@@ -36,6 +36,6 @@ personSchema.set('toJSON', {
     }
 })
 
-const Person = new mongoose.model("Person", personSchema)
+const Person = new mongoose.model('Person', personSchema)
 
-module.exports = Person;
+module.exports = Person

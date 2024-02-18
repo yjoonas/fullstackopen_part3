@@ -1,17 +1,17 @@
 require('dotenv').config()
-const express = require('express');
+const express = require('express')
 const morgan = require('morgan')
-const cors = require("cors")
-const app = express();
-const Person = require("./models/person")
-const PORT = process.env.PORT || 3001;
+const cors = require('cors')
+const app = express()
+const Person = require('./models/person')
+const PORT = process.env.PORT || 3001
 
 morgan.token('body', (req) => {
     return JSON.stringify(req.body)
 })
 
 app.use(express.json())
-app.use(express.static("dist"))
+app.use(express.static('dist'))
 app.use(cors())
 app.use(morgan((tokens, req, res) => {
     const arr = [
@@ -28,7 +28,7 @@ app.use(morgan((tokens, req, res) => {
 }))
 
 
-app.get("/", (req, res) => {
+app.get('/', () => {
 })
 app.get('/info', (req, res) => {
     Person.find({}).then(savedPersons => {
@@ -45,10 +45,10 @@ app.get('/api/persons', (req, res) => {
 })
 
 app.post('/api/persons', (req, res, next) => {
-    const body = req.body;
+    const body = req.body
     if (!body.name || !body.phoneNumber) {
         res.status(422).json({
-            error: "Missing body name or number"
+            error: 'Missing body name or number'
         })
     } /*else if (persons.filter(p => p.name === person.name).length > 0) {
         res.status(409).json({
@@ -70,7 +70,7 @@ app.get('/api/persons/:id', (req, res, next) => {
     Person.findById(req.params.id)
         .then(person => {
             if (person) {
-                res.json(person);
+                res.json(person)
             } else {
                 res.status(404).end()
             }
@@ -81,7 +81,7 @@ app.get('/api/persons/:id', (req, res, next) => {
 })
 app.put('/api/persons/:id', (req, res, next) => {
     const person = req.body
-    Person.findByIdAndUpdate(req.params.id, person, {new: true})
+    Person.findByIdAndUpdate(req.params.id, person, { new: true })
         .then(updatedPerson => res.json(updatedPerson))
         .catch(error => next(error))
 })
@@ -92,7 +92,7 @@ app.delete('/api/persons/:id', (req, res, next) => {
 })
 
 const unknownEndPoint = (request, response) => {
-    response.status(404).send({ error: "Unknown endpoint"})
+    response.status(404).send({ error: 'Unknown endpoint' })
 }
 app.use(unknownEndPoint)
 const errorHandler = (error, request, response, next) => {

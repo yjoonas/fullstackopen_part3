@@ -9,7 +9,9 @@
     "dev": "nodemon index.js --watch",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:ui": "rm -rf dist && cd ../full_stack_open/osa2/puhelinluettelo && npm run build && cp -r dist ../../../full_stack_open_osa_3/",
-    "deploy:ui": "npm run build:ui && git add . && git commit -m buildui && git push"
+    "deploy:ui": "npm run build:ui && git add . && git commit -m buildui && git push",
+    "lint": "eslint .",
+    "lint:fix": "npm run lint -- --fix"
   },
   "author": "joonas",
   "license": "ISC",
@@ -21,6 +23,8 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "@stylistic/eslint-plugin-js": "^1.6.2",
+    "eslint": "^8.56.0",
     "nodemon": "^3.0.3"
   }
 }
