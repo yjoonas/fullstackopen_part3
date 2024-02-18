@@ -1,7 +1,9 @@
+require('dotenv').config()
 const express = require('express');
 const morgan = require('morgan')
 const cors = require("cors")
 const app = express();
+const Person = require("./models/person")
 const PORT = process.env.PORT || 3001;
 
 morgan.token('body', (req) => {
@@ -25,57 +27,41 @@ app.use(morgan((tokens, req, res) => {
     return arr.join(' ')
 }))
 
-let persons = [
-    {
-     id: 1,
-     name: "Matti meikäläinen",
-     number: "123-123-123"
-    },
-    {
-     id: 2,
-     name: "Maija meikäläinen",
-     number: "123-123-123"
-    },
-    {
-     id: 3,
-     name: "Martta meikäläinen",
-     number: "123-123-123"
-    },
-    {
-     id: 4,
-     name: "Mauri meikäläinen",
-     number: "123-123-123"
-    },
 
-]
 app.get("/", (req, res) => {
 })
 app.get('/info', (req, res) => {
-    res.end(`
-    <p>Phonebook has info for ${persons.length} people</p>
-    <p>${new Date()}</p>
-    `)
+    Person.find({}).then(savedPersons => {
+        res.end(`
+        <p>Phonebook has info for ${savedPersons.length} people</p>
+        <p>${new Date()}</p>
+        `)
+    })
 })
 app.get('/api/persons', (req, res) => {
-    res.json(persons);
+    Person.find({}).then(savedPersons => {
+        res.json(savedPersons)
+    })
 })
 
 app.post('/api/persons', (req, res) => {
-    const person = req.body;
-    const id = Math.floor(Math.random() * 100000000)
-    if (!person.name || !person.number) {
+    const body = req.body;
+    if (!body.name || !body.phoneNumber) {
         res.status(422).json({
             error: "Missing body name or number"
         })
-    } else if (persons.filter(p => p.name === person.name).length > 0) {
+    } /*else if (persons.filter(p => p.name === person.name).length > 0) {
         res.status(409).json({
             error: "Name must be unique"
         })
-    } else {
-        persons = persons.concat({
-            ...person, id
+    } */else {
+        const person = new Person({
+            name: body.name,
+            phoneNumber: body.phoneNumber
         })
-        res.json(person)
+        person.save().then(savedPerson => {
+            res.json(savedPerson)
+        })
     }
 
 })
